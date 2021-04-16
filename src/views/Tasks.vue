@@ -1,5 +1,5 @@
 <template>
-  <div class="home pa-6">
+  <div class="pa-6">
     <h1>Tasks</h1>
 
     <v-form>
@@ -23,7 +23,8 @@
     <v-data-table
         :headers="headers"
         :items="tasks"
-        class="elevation-5"
+        class="elevation-5 table-cursor"
+        @click:row="showDetails"
     >
       <template v-slot:item.status="{ item }">
         <v-chip
@@ -37,23 +38,31 @@
       </template>
       <template v-slot:item.email="{ item }">
         {{ item.email }}
-        <v-icon left small color="green" v-if="item.emailSent">
+        <v-icon left small color="green" v-if="item.emailSent" >
           mdi-check-bold
         </v-icon>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon
-            class="mr-2"
-            @click="showItem(item)"
+        <v-btn  :to="{name:'Task', params: {id: item.id, task: item}}"
+               fab
+               x-small
+                color="info"
+                class="ma-2"
         >
-          mdi-file-find
-        </v-icon>
-        <v-icon v-if="item.status === 'Cancelled'"
-            class="mr-2"
-            @click="showItem(item)"
+          <v-icon>
+            mdi-file-find
+          </v-icon>
+        </v-btn>
+        <v-btn v-if="item.status === 'Cancelled'" :to="{name:'Task', params: {id: item.id, task: item}}"
+            class="mx-2 white--text"
+            fab
+            x-small
+            color="amber darken-3"
         >
-          mdi-reload
-        </v-icon>
+          <v-icon>
+            mdi-reload
+          </v-icon>
+        </v-btn>
       </template>
       <template v-slot:no-data>
         <v-btn
@@ -112,7 +121,7 @@ export default {
           emailSent: false
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e8',
           date: '14-02-2021 04:44 hs',
           status: 'Waiting',
           duration: '-',
@@ -121,7 +130,7 @@ export default {
           emailSent: false
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e7',
           date: '15-02-2021 12:00 hs',
           status: 'Waiting',
           duration: '-',
@@ -130,7 +139,7 @@ export default {
           emailSent: false
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e6',
           date: '18-02-2021 19:45 hs',
           status: 'Waiting',
           duration: '-',
@@ -139,7 +148,7 @@ export default {
           emailSent: false
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e5',
           date: '28-02-2021 19:45 hs',
           status: 'Finished',
           duration: '18',
@@ -148,7 +157,7 @@ export default {
           emailSent: true
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e4',
           date: '24-02-2021 19:45 hs',
           status: 'Finished',
           duration: '220',
@@ -157,7 +166,7 @@ export default {
           emailSent: true
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e3',
           date: '16-02-2021 19:45 hs',
           status: 'Finished',
           duration: '96',
@@ -166,7 +175,7 @@ export default {
           emailSent: true
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e2',
           date: '13-02-2021 19:45 hs',
           status: 'Finished',
           duration: '18',
@@ -175,7 +184,7 @@ export default {
           emailSent: true
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496eb',
+          id: '5a11baea-ba3e-422a-92cc-a167c71496e1',
           date: '01-02-2021 10:00 hs',
           status: 'Cancelled',
           duration: '-',
@@ -185,8 +194,8 @@ export default {
         }
       ]
     },
-    showItem (item) {
-      //go to item detail page
+    showDetails (item) {
+      this.$router.push({name:'Task', params: {id: item.id, task: item}})
     },
     getColor (status) {
       if (status === 'In Progress') return 'blue'
@@ -197,3 +206,8 @@ export default {
   },
 }
 </script>
+<style>
+.table-cursor tbody tr:hover {
+  cursor: pointer;
+}
+</style>

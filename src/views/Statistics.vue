@@ -1,5 +1,5 @@
 <template>
-  <div class="about pa-6">
+  <div class="pa-6">
     <h1>Statistics</h1>
     <v-container fluid v-resize="onResize">
       <v-row dense>
