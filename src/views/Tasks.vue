@@ -85,11 +85,11 @@ export default {
   data: () => ({
     headers: [
         { text: 'Order Number', value: 'id', sortable: false},
-        { text: 'Creation Date', value: 'date' },
         { text: 'Status', value: 'status' },
-        { text: 'Duration (min)', value: 'duration' },
-        { text: 'Email', value: 'email' },
-        { text: 'Type', value: 'type' },
+        { text: 'Creation Date', value: 'date' },
+      { text: 'Email', value: 'email' },
+      { text: 'Type', value: 'type' },
+      { text: 'Duration (min)', value: 'duration' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       tasks: [],
@@ -109,6 +109,7 @@ export default {
           duration: '-',
           type: 'Initial Sequence',
           email: 'test@patena.com.ar',
+          attempts: 1,
           emailSent: false
         },
         {
@@ -118,6 +119,7 @@ export default {
           duration: '-',
           type: 'Only flanking',
           email: 'test2@patena.com.ar',
+          attempts: 1,
           emailSent: false
         },
         {
@@ -127,6 +129,7 @@ export default {
           duration: '-',
           type: 'No initial data',
           email: 'test3@patena.com.ar',
+          attempts: 0,
           emailSent: false
         },
         {
@@ -136,6 +139,7 @@ export default {
           duration: '-',
           type: 'Flanking + initial sequence',
           email: 'test3@patena.com.ar',
+          attempts: 0,
           emailSent: false
         },
         {
@@ -145,15 +149,24 @@ export default {
           duration: '-',
           type: 'Initial sequence',
           email: 'test3@patena.com.ar',
+          attempts: 0,
           emailSent: false
         },
         {
-          id: '5a11baea-ba3e-422a-92cc-a167c71496e5',
+          id: '5a11baea-ba3e-422a-92cc-a1AAAAAAAAAA',
           date: '28-02-2021 19:45 hs',
           status: 'Finished',
           duration: '18',
           type: 'Initial sequence',
+          data: {
+            initialSequence: '>sp|P60844|AQPZ_ECOLI Aquaporin Z OS=Escherichia coli (strain K12) OX=83333 GN=aqpZ PE=1 SV=1\n' +
+                'AMAIYLTAGVSGAHLNPAVTIALWLFACFDKRKVIPFIVSQVAGAFCAAALVYGLYYNL',
+            initialScore: 348,
+            result: 'NNLGEEKGECVGVGTKGRQKAMGRCPVLGEALDEYPINHPCKIGHHLGHLALGPIPLGL',
+            finalScore: 0
+          },
           email: 'test_finished@patena.com.ar',
+          attempts: 1,
           emailSent: true
         },
         {
@@ -163,6 +176,7 @@ export default {
           duration: '220',
           type: 'Initial sequence',
           email: 'help@patena.com.ar',
+          attempts: 2,
           emailSent: true
         },
         {
@@ -172,6 +186,7 @@ export default {
           duration: '96',
           type: 'Initial sequence',
           email: 'support@patena.com.ar',
+          attempts: 3,
           emailSent: true
         },
         {
@@ -190,6 +205,7 @@ export default {
           duration: '-',
           type: 'Initial sequence',
           email: 'cancelled@patena.com.ar',
+          attempts: 3,
           emailSent: true
         }
       ]
