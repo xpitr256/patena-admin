@@ -45,7 +45,7 @@
 
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-app-bar-title>Dashboard</v-app-bar-title>
+      <v-app-bar-title>Admin</v-app-bar-title>
 
       <v-spacer></v-spacer>
 
@@ -68,7 +68,7 @@
             src="https://cdn.vuetifyjs.com/images/backgrounds/bg.jpg"
             cols="12"
         >
-          {{ new Date().getFullYear() }} — <strong>Patena Dashboard</strong>
+          {{ new Date().getFullYear() }} — <strong>Patena Admin</strong>
         </v-col>
       </v-row>
     </v-footer>
