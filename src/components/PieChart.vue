@@ -5,28 +5,26 @@
 </template>
 
 <script>
-import pieChartData from './pie-data.js'
-import Chart from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import pieChartData from "./pie-data.js";
+import Chart from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.plugins.register(ChartDataLabels);
 
 export default {
-name: "PieChart",
+  name: "PieChart",
   components: {
-    ChartDataLabels,
+    ChartDataLabels
   },
   data() {
     return {
       pieChartData: pieChartData
-    }
+    };
   },
   mounted() {
-    const ctx = document.getElementById('pie-chart');
+    const ctx = document.getElementById("pie-chart");
     new Chart(ctx, this.pieChartData);
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
