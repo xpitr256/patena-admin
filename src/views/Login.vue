@@ -9,9 +9,30 @@
                 <img src="login_logo.png" alt="Patena" height="95%" />
               </v-toolbar>
               <v-card-text>
-                <v-form>
-                  <v-text-field prepend-icon="mdi-account" name="email" label="Email" type="text" v-model="email"></v-text-field>
-                  <v-text-field id="password" prepend-icon="mdi-lock" name="password" label="Password" type="password" v-model="password"></v-text-field>
+                <v-form ref="form" lazy-validation>
+                  <v-text-field
+                    prepend-icon="mdi-account"
+                    name="email"
+                    abel="Email"
+                    type="email"
+                    v-model="email"
+                    placeholder="Email"
+                    v-on:keyup.enter="handleSubmit"
+                    ref="email"
+                    :rules="emailRule"
+                    required
+                  ></v-text-field>
+                  <v-text-field
+                    id="password"
+                    prepend-icon="mdi-lock"
+                    name="password"
+                    label="Password"
+                    type="password"
+                    v-model="password"
+                    v-on:keyup.enter="handleSubmit"
+                    :rules="passRule"
+                    required
+                  ></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
@@ -19,10 +40,14 @@
                 <v-btn color="primary" to="/" large @click="handleSubmit">Sign In</v-btn>
               </v-card-actions>
             </v-card>
+            <v-alert v-show="errorMessage !== ''" dismissible color="red" border="left" elevation="2" colored-border class="mt-3" icon="mdi-alert">{{
+              errorMessage
+            }}</v-alert>
           </v-flex>
         </v-layout>
       </v-container>
     </v-content>
+    <vue-progress-bar></vue-progress-bar>
   </v-app>
 </template>
 
@@ -37,20 +62,36 @@ export default {
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
+      errorMessage: "",
+      passRule: [v => !!v || "Password is required", v => v.length >= 6 || "Password must be at least 6 characters"],
+      emailRule: [v => /^[^\s@]+@[^\s@]+$/.test(v) || "Invalid Email address"]
     };
   },
+  created: function() {
+    setTimeout(() => {
+      this.$nextTick(() => this.setFocus());
+    }, 100);
+  },
   methods: {
+    setFocus: function() {
+      this.$refs.email.focus();
+    },
+    clearErrorMessage() {
+      this.errorMessage = "";
+    },
     async handleSubmit(e) {
       e.preventDefault();
-      if (this.password.length > 0 && this.email.length > 0) {
+      if (this.$refs.form.validate()) {
+        this.clearErrorMessage();
+        this.$Progress.start();
         const response = await BackendService.login(this.email, this.password);
+        this.$Progress.finish();
         if (!response.error && response.auth) {
           localStorage.setItem("user-token", response.token);
           this.$router.push("task");
         } else {
-          //todo show error message
-          console.error(response.error);
+          this.errorMessage = response.error;
         }
       }
     }

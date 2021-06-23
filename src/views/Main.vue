@@ -40,6 +40,7 @@
         </v-col>
       </v-row>
     </v-footer>
+    <vue-progress-bar></vue-progress-bar>
   </v-app>
 </template>
 
