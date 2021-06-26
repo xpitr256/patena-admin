@@ -83,7 +83,7 @@ export default {
     },
     getColor(status) {
       if (status === "In Progress") return "blue";
-      if (status === "Waiting") return "blue-grey";
+      if (status === "Pending") return "blue-grey";
       if (status === "Finished") return "green";
       return "red";
     }

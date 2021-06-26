@@ -1,4 +1,5 @@
 import Vue from "vue";
+import Router from "../router/index";
 
 const baseDomain = process.env.VUE_APP_BACK_END_BASE_URL;
 
@@ -10,9 +11,6 @@ export default {
       if (response.ok) {
         return response.body;
       }
-      return {
-        error: response.body.message
-      };
     } catch (error) {
       console.error("BackendService -> login -> " + error.status);
       return {
@@ -20,7 +18,7 @@ export default {
       };
     }
   },
-  /*async getMockedTasks() {
+  async getMockedTasks() {
     return [
       {
         id: "7da10fc2-ad51-451c-b491-09a653de8fe0",
@@ -80,8 +78,8 @@ export default {
         type: "Initial sequence",
         data: {
           initialSequence:
-              ">sp|P60844|AQPZ_ECOLI Aquaporin Z OS=Escherichia coli (strain K12) OX=83333 GN=aqpZ PE=1 SV=1\n" +
-              "AMAIYLTAGVSGAHLNPAVTIALWLFACFDKRKVIPFIVSQVAGAFCAAALVYGLYYNL",
+            ">sp|P60844|AQPZ_ECOLI Aquaporin Z OS=Escherichia coli (strain K12) OX=83333 GN=aqpZ PE=1 SV=1\n" +
+            "AMAIYLTAGVSGAHLNPAVTIALWLFACFDKRKVIPFIVSQVAGAFCAAALVYGLYYNL",
           initialScore: 348,
           result: "NNLGEEKGECVGVGTKGRQKAMGRCPVLGEALDEYPINHPCKIGHHLGHLALGPIPLGL",
           finalScore: 0
@@ -131,7 +129,6 @@ export default {
       }
     ];
   },
-   */
   async getTasks() {
     try {
       let response = await Vue.http.get(baseDomain + "/tasks", {
@@ -142,13 +139,13 @@ export default {
       if (response.ok) {
         return response.body;
       }
-      return {
-        error: response.body
-      };
     } catch (error) {
       console.error("BackendService -> getTasks -> " + error.status);
+      if (error.status === 401) {
+        Router.push("/logout");
+      }
       return {
-        error: error.body
+        error: error.body.message
       };
     }
   }

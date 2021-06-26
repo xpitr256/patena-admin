@@ -32,16 +32,25 @@
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col cols="12" sm="10">
-            <v-textarea outlined readonly no-resize label="Initial Sequence" rows="2" v-model="task.data.initialSequence"></v-textarea>
-          </v-col>
-          <v-col cols="12" sm="2">
-            <v-text-field v-model="task.data.initialScore" label="Initial score" readonly></v-text-field>
+        <v-row v-if="task.taskData.distance">
+          <v-col cols="12" sm="4">
+            <v-text-field v-model="task.taskData.distance" label="Distance (A)" readonly></v-text-field>
           </v-col>
         </v-row>
 
         <v-row>
+          <v-col cols="12" sm="10" v-if="task.taskData.initialSequence">
+            <v-textarea outlined readonly no-resize label="Initial Sequence" rows="2" v-model="task.taskData.initialSequence.value"></v-textarea>
+          </v-col>
+          <v-col cols="12" sm="10" v-if="!task.taskData.initialSequence && task.output && task.output.initialSequence">
+            <v-textarea outlined readonly no-resize label="Initial Sequence" rows="2" v-model="task.output.initialSequence"></v-textarea>
+          </v-col>
+          <v-col cols="12" sm="2" v-if="task.output">
+            <v-text-field v-model="task.output.initialScore" label="Initial score" readonly></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row v-if="task.output">
           <v-col cols="12" sm="10">
             <v-textarea
               outlined
@@ -50,13 +59,13 @@
               label="Result"
               rows="2"
               color="#4CAF50"
-              v-model="task.data.result"
+              v-model="task.output.finalSequence"
               class="v-input--is-focused result"
               background-color="light-green lighten-5"
             ></v-textarea>
           </v-col>
           <v-col cols="12" sm="2">
-            <v-text-field v-model="task.data.finalScore" label="Final score" readonly></v-text-field>
+            <v-text-field v-model="task.output.finalScore" label="Final score" readonly></v-text-field>
           </v-col>
         </v-row>
       </v-container>
@@ -72,6 +81,9 @@ export default {
   }),
   async created() {
     this.task = this.$route.params.task;
+    if (!this.task.email) {
+      this.task.email = "-";
+    }
     if (!this.task) {
       console.log("loading task...");
     }
@@ -79,7 +91,7 @@ export default {
   methods: {
     getTextColor(status) {
       if (status === "In Progress") return "blue--text";
-      if (status === "Waiting") return "blue-grey--text";
+      if (status === "Pending") return "blue-grey--text";
       if (status === "Finished") return "green--text";
       return "red--text";
     }
