@@ -32,17 +32,17 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="task.taskData.distance">
+        <v-row v-if="task.taskData && task.taskData.distance">
           <v-col cols="12" sm="4">
             <v-text-field v-model="task.taskData.distance" label="Distance (A)" readonly></v-text-field>
           </v-col>
         </v-row>
 
         <v-row>
-          <v-col cols="12" sm="10" v-if="task.taskData.initialSequence">
+          <v-col cols="12" sm="10" v-if="task.taskData && task.taskData.initialSequence">
             <v-textarea outlined readonly no-resize label="Initial Sequence" rows="2" v-model="task.taskData.initialSequence.value"></v-textarea>
           </v-col>
-          <v-col cols="12" sm="10" v-if="!task.taskData.initialSequence && task.output && task.output.initialSequence">
+          <v-col cols="12" sm="10" v-if="task.taskData && !task.taskData.initialSequence && task.output && task.output.initialSequence">
             <v-textarea outlined readonly no-resize label="Initial Sequence" rows="2" v-model="task.output.initialSequence"></v-textarea>
           </v-col>
           <v-col cols="12" sm="2" v-if="task.output">
@@ -74,18 +74,22 @@
 </template>
 
 <script>
+import BackendService from "../services/BackendService";
+
 export default {
   name: "Task",
   data: () => ({
-    task: {}
+    task: { id: "" }
   }),
   async created() {
-    this.task = this.$route.params.task;
+    const taskFromList = this.$route.params.task;
+    if (!taskFromList) {
+      this.task = await BackendService.getTask(this.$route.params.id);
+    } else {
+      this.task = taskFromList;
+    }
     if (!this.task.email) {
       this.task.email = "-";
-    }
-    if (!this.task) {
-      console.log("loading task...");
     }
   },
   methods: {

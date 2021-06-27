@@ -1,12 +1,18 @@
 <template>
   <div class="pa-6">
     <h1>Tasks</h1>
-
-    <v-form>
+    <v-form ref="form" v-on:submit.prevent="loadTask">
       <v-container>
         <v-row>
           <v-col cols="12" sm="4">
-            <v-text-field outlined label="Order number" prepend-inner-icon="mdi-magnify"></v-text-field>
+            <v-text-field
+              outlined
+              label="Order number"
+              prepend-inner-icon="mdi-magnify"
+              v-model="orderNumber"
+              :error-messages="orderNumberError"
+              @paste="onPaste"
+            ></v-text-field>
           </v-col>
         </v-row>
       </v-container>
@@ -67,16 +73,69 @@ export default {
       { text: "Duration (min)", value: "duration" },
       { text: "Actions", value: "actions", sortable: false }
     ],
-    tasks: []
+    tasks: [],
+    orderNumberError: [],
+    orderNumber: ""
   }),
-
   created() {
     this.initialize();
   },
-
+  watch: {
+    orderNumber: function(val) {
+      if (val.length === 0) {
+        var self = this;
+        setTimeout(function() {
+          self.cleanOrderNumberErrors();
+        }, 1000);
+      }
+    }
+  },
   methods: {
     async initialize() {
       this.tasks = await BackendService.getTasks();
+    },
+    onPaste(e) {
+      setTimeout(() => {
+        this.loadTask(e);
+      }, 100);
+    },
+    cleanOrderNumberErrors() {
+      this.orderNumberError = [];
+    },
+    validOrderNumber() {
+      if (!this.orderNumber) {
+        return {
+          valid: false,
+          message: "Order number is required"
+        };
+      }
+
+      if (this.orderNumber.length !== 36) {
+        return {
+          valid: false,
+          message: "Order number must has 36 characters"
+        };
+      }
+      return {
+        valid: true
+      };
+    },
+    async loadTask(e) {
+      e.preventDefault();
+      this.cleanOrderNumberErrors();
+      const orderNumberValidation = this.validOrderNumber();
+      if (orderNumberValidation.valid) {
+        this.$Progress.start();
+        const task = await BackendService.getTask(this.orderNumber);
+        this.$Progress.finish();
+        if (!task.error) {
+          this.showDetails(task);
+        } else {
+          this.orderNumberError.push(task.error);
+        }
+      } else {
+        this.orderNumberError.push(orderNumberValidation.message);
+      }
     },
     showDetails(item) {
       this.$router.push({ name: "Task", params: { id: item.id, task: item } });

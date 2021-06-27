@@ -148,5 +148,25 @@ export default {
         error: error.body.message
       };
     }
+  },
+  async getTask(taskId) {
+    try {
+      let response = await Vue.http.get(baseDomain + "/tasks/" + taskId, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("user-token")
+        }
+      });
+      if (response.ok) {
+        return response.body;
+      }
+    } catch (error) {
+      console.error("BackendService -> getTask -> " + taskId + " -> " + error.status);
+      if (error.status === 401) {
+        Router.push("/logout");
+      }
+      return {
+        error: error.body.message
+      };
+    }
   }
 };
