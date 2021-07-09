@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-navigation-drawer app v-model="drawer" src="https://cdn.vuetifyjs.com/images/backgrounds/bg.jpg">
-      <img src="logo.png" class="pa-2" width="75%" alt="Patena" />
+      <img src="/logo.png" class="pa-2" width="75%" alt="Patena" />
 
       <v-divider></v-divider>
 

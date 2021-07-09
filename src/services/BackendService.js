@@ -129,9 +129,13 @@ export default {
       }
     ];
   },
-  async getTasks() {
+  async getTasks(count, offset, state) {
     try {
-      let response = await Vue.http.get(baseDomain + "/tasks", {
+      let requestUrl = baseDomain + "/tasks";
+      if (count && count >= 10) {
+        requestUrl += "?limit=" + count + "&state=" + 3 + "&offset=0";
+      }
+      let response = await Vue.http.get(requestUrl, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("user-token")
         }

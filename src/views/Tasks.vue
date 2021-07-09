@@ -18,14 +18,14 @@
       </v-container>
     </v-form>
 
-    <v-data-table :headers="headers" :items="tasks" class="elevation-5 table-cursor" @click:row="showDetails">
+    <v-data-table :headers="headers" :items="tasks" class="elevation-5 table-cursor" @click:row="showDetails" hide-default-footer :loading="loading">
       <template v-slot:item.status="{ item }">
         <v-chip :color="getColor(item.status)" dark label class="font-weight-bold">
           {{ item.status }}
         </v-chip>
       </template>
       <template v-slot:item.email="{ item }">
-        {{ item.email }}
+        {{ item.taskData.email }}
         <v-icon left small color="green" v-if="item.emailSent">
           mdi-check-bold
         </v-icon>
@@ -75,7 +75,8 @@ export default {
     ],
     tasks: [],
     orderNumberError: [],
-    orderNumber: ""
+    orderNumber: "",
+    loading: true
   }),
   created() {
     this.initialize();
@@ -92,7 +93,9 @@ export default {
   },
   methods: {
     async initialize() {
-      this.tasks = await BackendService.getTasks();
+      this.loading = true;
+      this.tasks = await BackendService.getTasks(10);
+      this.loading = false;
     },
     onPaste(e) {
       setTimeout(() => {
