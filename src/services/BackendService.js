@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Router from "../router/index";
+import constants from "../constants";
 
 const baseDomain = process.env.VUE_APP_BACK_END_BASE_URL;
 
@@ -129,11 +130,18 @@ export default {
       }
     ];
   },
-  async getTasks(count, offset, state) {
+  async getTasks(count, offset, status) {
     try {
       let requestUrl = baseDomain + "/tasks";
-      if (count && count >= 10) {
-        requestUrl += "?limit=" + count + "&state=" + 3 + "&offset=0";
+      if (count && count >= 5) {
+        requestUrl += "?limit=" + count;
+      }
+      if (offset) {
+        requestUrl += "&offset=" + offset;
+      }
+      const stateId = constants.getTaskStateId(status);
+      if (stateId) {
+        requestUrl += "&state=" + stateId;
       }
       let response = await Vue.http.get(requestUrl, {
         headers: {

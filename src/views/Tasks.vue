@@ -4,7 +4,7 @@
     <v-form ref="form" v-on:submit.prevent="loadTask">
       <v-container>
         <v-row>
-          <v-col cols="12" sm="4">
+          <v-col sm="4" class="pl-0">
             <v-text-field
               outlined
               label="Order number"
@@ -14,11 +14,26 @@
               @paste="onPaste"
             ></v-text-field>
           </v-col>
+          <v-col sm="2">
+            <v-select :items="taskStatuses" v-model="taskStatus" label="Task status" @change="taskStatusChanged" outlined></v-select>
+          </v-col>
         </v-row>
       </v-container>
     </v-form>
 
-    <v-data-table :headers="headers" :items="tasks" class="elevation-5 table-cursor" @click:row="showDetails" hide-default-footer :loading="loading">
+    <v-data-table
+      :headers="headers"
+      :items="tasks"
+      class="elevation-5 table-cursor"
+      @click:row="showDetails"
+      @update:options="updateOptions"
+      :options.sync="options"
+      :server-items-length="totalTasks"
+      :footer-props="{
+        itemsPerPageOptions: [5, 10, 25]
+      }"
+      :loading="loading"
+    >
       <template v-slot:item.status="{ item }">
         <v-chip :color="getColor(item.status)" dark label class="font-weight-bold">
           {{ item.status }}
@@ -60,6 +75,7 @@
 
 <script>
 import BackendService from "../services/BackendService";
+import constants from "../constants";
 
 export default {
   name: "Tasks",
@@ -75,12 +91,13 @@ export default {
     ],
     tasks: [],
     orderNumberError: [],
+    taskStatuses: constants.getTaskStatuses(),
+    options: {},
+    totalTasks: 0,
     orderNumber: "",
+    taskStatus: "All",
     loading: true
   }),
-  created() {
-    this.initialize();
-  },
   watch: {
     orderNumber: function(val) {
       if (val.length === 0) {
@@ -89,18 +106,39 @@ export default {
           self.cleanOrderNumberErrors();
         }, 1000);
       }
+    },
+    options: {
+      handler() {
+        this.initialize();
+      },
+      deep: true
     }
   },
   methods: {
     async initialize() {
+      if (this.$route.params.taskStatus) {
+        this.taskStatus = this.$route.params.taskStatus;
+      }
+      await this.loadTasks(this.taskStatus);
+    },
+    async loadTasks(status) {
       this.loading = true;
-      this.tasks = await BackendService.getTasks(10);
+      const count = this.options.itemsPerPage;
+      const offset = Number(this.options.page - 1);
+      this.tasks = await BackendService.getTasks(count, offset, status);
+      this.totalTasks = 100; //TODO get it from backend
       this.loading = false;
+    },
+    updateOptions(options) {
+      console.log("updateOptions", options);
     },
     onPaste(e) {
       setTimeout(() => {
         this.loadTask(e);
       }, 100);
+    },
+    taskStatusChanged(selected) {
+      this.loadTasks(selected);
     },
     cleanOrderNumberErrors() {
       this.orderNumberError = [];
@@ -141,7 +179,7 @@ export default {
       }
     },
     showDetails(item) {
-      this.$router.push({ name: "Task", params: { id: item.id, task: item } });
+      this.$router.push({ name: "Task", params: { id: item.id, task: item, taskStatus: this.taskStatus } });
     },
     getColor(status) {
       if (status === "In Progress") return "blue";

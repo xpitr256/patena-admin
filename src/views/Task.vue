@@ -96,11 +96,7 @@
       {{ taskError }}
     </v-alert>
 
-    <v-btn color="primary" outlined class="mt-8" @click="$router.push('/')">
-      <v-icon left>
-        mdi-arrow-left </v-icon
-      >Back to list
-    </v-btn>
+    <v-btn color="primary" outlined class="mt-8" @click="goBackToList"> <v-icon left> mdi-arrow-left </v-icon>Back to list </v-btn>
   </div>
 </template>
 
@@ -141,6 +137,9 @@ export default {
       if (!this.task.taskData.email || this.task.taskData.email === "") {
         this.task.taskData.email = "-";
       }
+    },
+    goBackToList() {
+      this.$router.push({ name: "Tasks", params: { taskStatus: this.$route.params.taskStatus } });
     }
   }
 };
