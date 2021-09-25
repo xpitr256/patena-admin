@@ -4,7 +4,10 @@
     <v-container fluid v-resize="onResize">
       <v-row dense>
         <v-col v-for="card in cards" :key="card.title" :cols="cardWithCols" class="d-flex flex-column">
-          <v-card elevation="5" class="ma-2">
+          <v-card elevation="5" class="ma-2" :loading="card.loading">
+            <template slot="progress">
+              <v-progress-linear color="primary" height="5" indeterminate></v-progress-linear>
+            </template>
             <v-card-title>
               <span v-text="card.title"></span>
               <v-tooltip top v-if="card.subtitle">
@@ -16,15 +19,10 @@
                 <span v-text="card.subtitle"></span>
               </v-tooltip>
             </v-card-title>
-            <v-card-text
-              fill-height
-              v-if="card.value"
-              class="pt-6 text-center align-center text-h1 font-weight-bold"
-              v-text="card.value"
-              v-bind:class="card.style"
-            ></v-card-text>
-            <PieChart v-if="card.type === 'pie'" />
-            <v-simple-table v-if="card.type === 'table'" class="text-center">
+            <v-card-text fill-height v-html="card.value" class="pt-6 text-center align-center text-h1 font-weight-bold" v-bind:class="card.style">
+            </v-card-text>
+            <PieChart v-if="card.type === 'pie'" v-show="!card.loading" />
+            <v-simple-table v-if="card.type === 'table'" class="text-center" v-show="!card.loading">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -59,17 +57,27 @@ export default {
   },
   data: () => ({
     cards: [
-      { title: "Success Rate", subtitle: "Calculated as amount of completed tasks / total tasks", value: "99,5%", style: "green lighten-1 white--text" },
+      {
+        title: "Success Rate",
+        subtitle: "Calculated as amount of completed tasks / total tasks",
+        style: "green lighten-1 white--text",
+        value: "&nbsp;",
+        loading: true,
+        loadingColor: "white"
+      },
       {
         title: "AVG Task Completion Time",
         subtitle: "It is the average completion time of all completed tasks up to the current date",
-        value: "45 min",
-        style: "grey lighten-3"
+        value: "&nbsp;",
+        style: "grey lighten-3",
+        loading: true,
+        loadingColor: "primary"
       },
-      { title: "Faster task completion Time", value: "3 min", style: "green lighten-1 white--text" },
-      { title: "Slower task completion Time", value: "240 min", style: "red lighten-2 white--text" },
+      { title: "Faster task completion Time", value: "&nbsp;", style: "green lighten-1 white--text", loading: true, loadingColor: "white" },
+      { title: "Slower task completion Time", value: "&nbsp;", style: "red lighten-2 white--text", loading: true, loadingColor: "white" },
       {
         title: "Task Queue status",
+        loading: true,
         type: "table",
         data: [
           { name: "In Progress", value: 2, style: "blue--text" },
@@ -78,7 +86,11 @@ export default {
           { name: "Cancelled", value: 4, style: "red--text" }
         ]
       },
-      { title: "Task Queue composition", type: "pie" }
+      {
+        title: "Task Queue composition",
+        loading: true,
+        type: "pie"
+      }
     ],
     cardWithCols: 4
   }),
@@ -93,6 +105,22 @@ export default {
   },
   mounted() {
     this.onResize();
+    setTimeout(() => {
+      this.cards[0].loading = false;
+      this.cards[0].value = "99.5%";
+
+      this.cards[1].loading = false;
+      this.cards[1].value = "45 min";
+
+      this.cards[2].loading = false;
+      this.cards[2].value = "4 min";
+
+      this.cards[3].loading = false;
+      this.cards[3].value = "200 min";
+
+      this.cards[4].loading = false;
+      this.cards[5].loading = false;
+    }, 2000);
   }
 };
 </script>
