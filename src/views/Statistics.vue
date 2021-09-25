@@ -10,7 +10,7 @@
             </template>
             <v-card-title>
               <span v-text="card.title"></span>
-              <v-tooltip top v-if="card.subtitle">
+              <v-tooltip top v-if="card.subtitle && !card.error">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon color="secondary" dark class="pl-2" v-bind="attrs" v-on="on">
                     mdi-information
@@ -18,10 +18,23 @@
                 </template>
                 <span v-text="card.subtitle"></span>
               </v-tooltip>
+              <v-tooltip top v-if="card.error">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon color="red darken-2" dark class="pl-2" v-bind="attrs" v-on="on">
+                    mdi-alert
+                  </v-icon>
+                </template>
+                <span v-text="card.error"></span>
+              </v-tooltip>
             </v-card-title>
-            <v-card-text fill-height v-html="card.value" class="pt-6 text-center align-center text-h1 font-weight-bold" v-bind:class="card.style">
-            </v-card-text>
-            <PieChart v-if="card.type === 'pie'" v-show="!card.loading" />
+            <v-card-text
+              fill-height
+              v-if="card.value"
+              v-html="card.value"
+              class="pt-6 text-center align-center text-h1 font-weight-bold"
+              v-bind:class="card.style"
+            ></v-card-text>
+            <PieChart v-if="card.type === 'pie'" v-show="!card.loading" v-bind:chart-data="card.data" />
             <v-simple-table v-if="card.type === 'table'" class="text-center" v-show="!card.loading">
               <template v-slot:default>
                 <thead>
@@ -51,6 +64,8 @@
 
 <script>
 import PieChart from "@/components/PieChart";
+import BackendService from "../services/BackendService";
+
 export default {
   components: {
     PieChart
@@ -79,12 +94,7 @@ export default {
         title: "Task Queue status",
         loading: true,
         type: "table",
-        data: [
-          { name: "In Progress", value: 2, style: "blue--text" },
-          { name: "Waiting", value: 5, style: "blue-grey--text" },
-          { name: "Finished", value: 245, style: "green--text" },
-          { name: "Cancelled", value: 4, style: "red--text" }
-        ]
+        data: [{ style: "blue--text" }, { style: "blue-grey--text" }, { style: "green--text" }, { style: "red--text" }]
       },
       {
         title: "Task Queue composition",
@@ -101,26 +111,80 @@ export default {
       } else {
         this.cardWithCols = 6;
       }
+    },
+    async getSuccessRate() {
+      const response = await BackendService.getSuccessRate();
+      if (!response.error) {
+        this.cards[0].value = response.success_rate + "%";
+      } else {
+        this.cards[0].error = response.error;
+        this.cards[0].value = "-";
+      }
+      this.cards[0].loading = false;
+    },
+    async getAverageProcessingTime() {
+      const response = await BackendService.getAverageProcessingTime();
+      if (!response.error) {
+        this.cards[1].value = response.avg_minutes + " min";
+      } else {
+        this.cards[1].error = response.error;
+        this.cards[1].value = "-";
+      }
+      this.cards[1].loading = false;
+    },
+    async getFastestProcessingTime() {
+      const response = await BackendService.getFastestProcessingTime();
+      if (!response.error) {
+        this.cards[2].value = response.time_minutes + " min";
+      } else {
+        this.cards[2].error = response.error;
+        this.cards[2].value = "-";
+      }
+      this.cards[2].loading = false;
+    },
+    async getSlowestProcessingTime() {
+      const response = await BackendService.getSlowestProcessingTime();
+      if (!response.error) {
+        this.cards[3].value = response.time_minutes + " min";
+      } else {
+        this.cards[3].error = response.error;
+        this.cards[4].value = "-";
+      }
+      this.cards[3].loading = false;
+    },
+    async getQueueStatus() {
+      const response = await BackendService.getQueueStatus();
+      if (!response.error) {
+        this.cards[4].data = response.map((element, index) => {
+          return {
+            name: element.name,
+            value: element.value,
+            style: this.cards[4].data[index].style
+          };
+        });
+      } else {
+        this.cards[4].error = response.error;
+      }
+      this.cards[4].loading = false;
+    },
+    async getQueueDesignTaskComposition() {
+      const response = await BackendService.getQueueDesignTaskComposition();
+      if (!response.error) {
+        this.cards[5].data = response;
+      } else {
+        this.cards[5].error = response.error;
+      }
+      this.cards[5].loading = false;
     }
   },
   mounted() {
     this.onResize();
-    setTimeout(() => {
-      this.cards[0].loading = false;
-      this.cards[0].value = "99.5%";
-
-      this.cards[1].loading = false;
-      this.cards[1].value = "45 min";
-
-      this.cards[2].loading = false;
-      this.cards[2].value = "4 min";
-
-      this.cards[3].loading = false;
-      this.cards[3].value = "200 min";
-
-      this.cards[4].loading = false;
-      this.cards[5].loading = false;
-    }, 2000);
+    this.getSuccessRate();
+    this.getAverageProcessingTime();
+    this.getFastestProcessingTime();
+    this.getSlowestProcessingTime();
+    this.getQueueStatus();
+    this.getQueueDesignTaskComposition();
   }
 };
 </script>

@@ -3,12 +3,12 @@ export const pieChartData = {
   data: {
     datasets: [
       {
-        data: [25, 100, 30, 50],
+        data: [],
         backgroundColor: ["#FFCC80", "#81D4FA", "#FFAB91", "#B39DDB"],
         borderColor: "#fff"
       }
     ],
-    labels: ["No initial data", "Initial sequence", "Only flanking", "Flanking + Initial sequence"]
+    labels: []
   },
   options: {
     responsive: true,

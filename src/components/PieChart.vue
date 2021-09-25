@@ -15,6 +15,15 @@ export default {
   components: {
     ChartDataLabels
   },
+  props: {
+    chartData: Array
+  },
+  watch: {
+    chartData: function(newVal) {
+      this.pieChartData.data.datasets[0].data = newVal.map(element => element.value);
+      this.pieChartData.data.labels = newVal.map(element => element.name + " (" + element.value + ")");
+    }
+  },
   data() {
     return {
       pieChartData: pieChartData
