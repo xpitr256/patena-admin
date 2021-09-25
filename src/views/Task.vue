@@ -139,7 +139,7 @@ export default {
       }
     },
     goBackToList() {
-      this.$router.push({ name: "Tasks", params: { taskStatus: this.$route.params.taskStatus } });
+      this.$router.push({ name: "Tasks" });
     }
   }
 };

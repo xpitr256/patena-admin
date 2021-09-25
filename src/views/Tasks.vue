@@ -65,7 +65,7 @@
         </v-btn>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">
+        <v-btn color="primary" @click="loadTasks">
           Reset
         </v-btn>
       </template>
@@ -96,7 +96,10 @@ export default {
     totalTasks: 0,
     orderNumber: "",
     taskStatus: "All",
-    loading: true
+    page: 1,
+    itemsPerPage: 10,
+    loading: true,
+    initialLoadIsDone: false
   }),
   watch: {
     orderNumber: function(val) {
@@ -109,28 +112,48 @@ export default {
     },
     options: {
       handler() {
-        this.initialize();
+        this.loadTasks();
       },
       deep: true
     }
   },
+  created() {
+    if (localStorage.taskStatus) {
+      this.taskStatus = localStorage.taskStatus;
+    }
+    if (localStorage.itemsPerPage) {
+      this.itemsPerPage = Number(localStorage.itemsPerPage);
+      this.options.itemsPerPage = Number(localStorage.itemsPerPage);
+    }
+    if (localStorage.page) {
+      this.page = Number(localStorage.page);
+      this.options.page = Number(localStorage.page);
+    }
+  },
+  mounted() {
+    this.initialLoadIsDone = true;
+  },
   methods: {
-    async initialize() {
-      if (this.$route.params.taskStatus) {
-        this.taskStatus = this.$route.params.taskStatus;
-      }
-      await this.loadTasks(this.taskStatus);
-    },
-    async loadTasks(status) {
+    async loadTasks() {
       this.loading = true;
-      const count = this.options.itemsPerPage;
-      const offset = Number(this.options.page - 1);
-      this.tasks = await BackendService.getTasks(count, offset, status);
-      this.totalTasks = 100; //TODO get it from backend
+      const count = this.itemsPerPage;
+      const offset = Number(this.page - 1);
+      const response = await BackendService.getTasks(count, offset, this.taskStatus);
+      this.tasks = response.tasks;
+      this.totalTasks = response.total;
       this.loading = false;
     },
     updateOptions(options) {
-      console.log("updateOptions", options);
+      if (this.initialLoadIsDone) {
+        if (options.itemsPerPage) {
+          localStorage.itemsPerPage = options.itemsPerPage;
+          this.itemsPerPage = options.itemsPerPage;
+        }
+        if (options.page) {
+          localStorage.page = options.page;
+          this.page = options.page;
+        }
+      }
     },
     onPaste(e) {
       setTimeout(() => {
@@ -138,7 +161,8 @@ export default {
       }, 100);
     },
     taskStatusChanged(selected) {
-      this.loadTasks(selected);
+      localStorage.taskStatus = selected;
+      this.loadTasks();
     },
     cleanOrderNumberErrors() {
       this.orderNumberError = [];
@@ -179,7 +203,7 @@ export default {
       }
     },
     showDetails(item) {
-      this.$router.push({ name: "Task", params: { id: item.id, task: item, taskStatus: this.taskStatus } });
+      this.$router.push({ name: "Task", params: { id: item.id, task: item } });
     },
     getColor(status) {
       if (status === "In Progress") return "blue";
