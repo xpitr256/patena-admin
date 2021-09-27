@@ -32,11 +32,7 @@ export default {
       if (stateId) {
         requestUrl += "&state=" + stateId;
       }
-      let response = await Vue.http.get(requestUrl, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("user-token")
-        }
-      });
+      let response = await Vue.http.get(requestUrl);
       if (response.ok) {
         return response.body;
       }
@@ -52,11 +48,7 @@ export default {
   },
   async getTask(taskId) {
     try {
-      let response = await Vue.http.get(baseDomain + "/tasks/" + taskId, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("user-token")
-        }
-      });
+      let response = await Vue.http.get(baseDomain + "/tasks/" + taskId);
       if (response.ok) {
         return response.body;
       }
@@ -70,13 +62,25 @@ export default {
       };
     }
   },
+  async retryTask(taskId) {
+    try {
+      let response = await Vue.http.put(baseDomain + "/tasks/" + taskId + "/retry");
+      if (response.ok) {
+        return response.body;
+      }
+    } catch (error) {
+      console.error("BackendService -> retryTask -> " + error.status);
+      if (error.status === 401) {
+        Router.push("/logout");
+      }
+      return {
+        error: error.body.message
+      };
+    }
+  },
   async getStatisticValue(endpoint) {
     try {
-      let response = await Vue.http.get(baseDomain + endpoint, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("user-token")
-        }
-      });
+      let response = await Vue.http.get(baseDomain + endpoint);
       if (response.ok) {
         return response.body;
       }

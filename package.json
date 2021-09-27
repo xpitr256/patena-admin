@@ -19,7 +19,8 @@
     "vue-progressbar": "^0.7.5",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.2.0",
-    "vuetify": "^2.4.0"
+    "vuetify": "^2.4.0",
+    "vuetify-confirm": "^2.0.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

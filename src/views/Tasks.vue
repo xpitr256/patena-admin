@@ -12,6 +12,7 @@
               v-model="orderNumber"
               :error-messages="orderNumberError"
               @paste="onPaste"
+              v-on:keyup.enter="loadTask"
             ></v-text-field>
           </v-col>
           <v-col sm="2">
@@ -51,14 +52,7 @@
             mdi-file-find
           </v-icon>
         </v-btn>
-        <v-btn
-          v-if="item.status === 'Cancelled'"
-          :to="{ name: 'Task', params: { id: item.id, task: item } }"
-          class="mx-2 white--text"
-          fab
-          x-small
-          color="amber darken-3"
-        >
+        <v-btn v-if="item.status === 'Cancelled'" class="mx-2 white--text" fab x-small color="amber darken-3" @click.stop="retryTask(item.id)">
           <v-icon>
             mdi-reload
           </v-icon>
@@ -142,6 +136,20 @@ export default {
       this.tasks = response.tasks;
       this.totalTasks = response.total;
       this.loading = false;
+    },
+    async retryTask(taskId) {
+      const res = await this.$confirm("Do you really want to retry the task ?", { color: "warning", title: "Warning" });
+      if (res) {
+        this.$Progress.start();
+        const response = await BackendService.retryTask(taskId);
+        if (!response.error) {
+          await this.loadTasks();
+          // TODO show a message that the task was updated to PENDING
+        } else {
+          // TODO show response.error message
+        }
+        this.$Progress.finish();
+      }
     },
     updateOptions(options) {
       if (this.initialLoadIsDone) {

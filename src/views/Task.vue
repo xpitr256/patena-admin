@@ -1,6 +1,6 @@
 <template>
   <div class="pa-6">
-    <div v-show="taskError === ''">
+    <div v-if="taskError === ''">
       <h1>Task {{ task.id }}</h1>
 
       <v-card class="my-4" elevation="2" outlined>
@@ -21,7 +21,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="12" sm="4">
+            <v-col cols="12" sm="4" v-if="task.taskData && task.taskData.email">
               <v-text-field v-model="task.taskData.email" label="Email" readonly></v-text-field>
             </v-col>
             <v-col cols="12" sm="4">
