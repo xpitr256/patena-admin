@@ -107,7 +107,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("https://cdn.pixabay.com/photo/2018/07/15/10/44/dna-3539309_1280.jpg");
+  background-image: url("https://pixabay.com/get/g13cc41fd2ef2287a98547a4fd28273aa5350dc5c5bbf1732f2bdb58eb845566a42c83f9851288dc5af1f53ea1a876090_1920.jpg");
   background-size: cover;
 }
 
@@ -118,6 +118,6 @@ export default {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.33);
 }
 </style>
